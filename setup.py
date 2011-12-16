@@ -11,7 +11,8 @@ setup(
 
     install_requires = [
         'numpy',
-        'scipy'
+        'scipy',
+        'networkx==1.6'
     ],
 
     entry_points = {
