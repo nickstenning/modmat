@@ -4,15 +4,18 @@ import sys
 from IPython.parallel import Client
 
 from modmat import parallel
+from modmat.printer import Printer
 from modmat.command.modmat import parser
 
 parser.add_argument('-i', '--iprofile',
                     help='IPython parallel profile to use', default='default')
-parser.add_argument('-q', '--npops', type=int, default=4,
+parser.add_argument('-q', '--npops', type=int, default=8,
                     help='number of populations to simulate')
 
 def main():
     args = parser.parse_args()
+
+    printer = Printer(args.datadir, args.npops)
 
     rc = Client(profile=args.iprofile)
     nc = len(rc)
@@ -36,10 +39,13 @@ def main():
         dv.apply(parallel.tick)
         dv.execute('stats = parallel.stats')
         stats = dv.gather('stats')
-        for s in stats:
-            print "%10.4g %10.4g " % (s['mean_fit'], s['mean_sccs']),
-        print ""
-        sys.stdout.flush()
+
+        for i, s in enumerate(stats):
+            printer.register(i, {
+                'summary': "%10.4g %10.4g\n" % (s['mean_fit'], s['mean_sccs'])
+            })
+
+        printer.tick()
 
 if __name__ == '__main__':
     main()
