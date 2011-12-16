@@ -10,8 +10,6 @@ setup(
     include_dirs = [np.get_include()],
 
     install_requires = [
-        'numpy',
-        'scipy',
         'networkx==1.6'
     ],
 
