@@ -1,0 +1,8 @@
+# modmat
+
+Some python tools for investigating the (possible) evolution of modularity
+in a population of matrices selected for a "stability" criterion.
+
+See:
+
+        "Variano, E. A., McCoy, J. H., & Lipson, H. (2004). Networks, Dynamics, and Modularity. Physical Review Letters, 92(18), 1-4. doi:10.1103/PhysRevLett.92.188701"
