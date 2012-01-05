@@ -4,7 +4,7 @@ class PrinterError(Exception):
     pass
 
 class Printer(object):
-    def __init__(self, path, npops):
+    def __init__(self, path, npops=1):
         self.path = path
         self.npops = npops
 

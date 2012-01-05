@@ -17,6 +17,8 @@ setup(
         'console_scripts': [
             'modmat = modmat.command.modmat:main',
             'modmatp = modmat.command.modmatp:main',
+            'plotmultihistmse = modmat.command.plotmultihistmse:main',
+            'plotmultihistseries3d = modmat.command.plotmultihistseries3d:main',
         ],
     }
 )

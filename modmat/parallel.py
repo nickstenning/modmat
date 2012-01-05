@@ -2,6 +2,7 @@ from __future__ import division
 
 from modmat import ga
 from modmat import net
+from modmat import util
 
 _n = None
 _npops = None
@@ -20,7 +21,7 @@ def init(npops, n, popsize):
     _popsize = popsize
     populations = []
     fitnesses = []
-    stats = [{}] * _npops
+    stats = [None] * _npops
 
     for i in xrange(_npops):
         pop, fit = ga.init(_n, _popsize)
@@ -33,8 +34,13 @@ def tick():
     for i in xrange(_npops):
         populations[i], fitnesses[i] = ga.tick(populations[i], fitnesses[i])
 
-        stats[i].update({
-            'mean_fit': sum(fitnesses[i]) / _popsize,
-            'mean_sccs': sum(net.num_sccs_in_array(m) for m in populations[i]) / _popsize
-        })
+        sccs = [net.sccs_in_array(m) for m in populations[i]]
+        sccs_flat = [x for s in sccs for x in s] # sccs across population
+        sccs_hist = util.histogram(sccs_flat)
+        sccs_hist = util.truncate_or_pad(sccs_hist, _n + 1, 0)[1:]
 
+        stats[i] = {
+            'mean_fit': sum(fitnesses[i]) / _popsize,
+            'mean_sccs': sum([len(s) for s in sccs]) / _popsize,
+            'sccs_hist': sccs_hist
+        }

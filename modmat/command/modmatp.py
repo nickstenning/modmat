@@ -1,15 +1,15 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, division, print_function
 
 import sys
 from IPython.parallel import Client
 
 from modmat import parallel
 from modmat.printer import Printer
-from modmat.command.modmat import parser
+from modmat.command.modmat import parser, print_tick
 
 parser.add_argument('-i', '--iprofile',
                     help='IPython parallel profile to use', default='default')
-parser.add_argument('-q', '--npops', type=int, default=8,
+parser.add_argument('-q', '--npops', type=int, default=20,
                     help='number of populations to simulate')
 
 def main():
@@ -23,7 +23,7 @@ def main():
     dv = rc[:]
     dv.block = True
 
-    print >>sys.stderr, "# Running on %s processes" % nc
+    print("# Running on %s processes" % nc, file=sys.stderr)
 
     dv.execute('from modmat import parallel')
 
@@ -35,17 +35,14 @@ def main():
     for i in xrange(nc):
         rc[i].apply(parallel.init, npops[i], args.n, args.popsize)
 
-    for _ in xrange(args.generations):
+    for i in xrange(args.generations):
+        print("Generation %d" % i, file=sys.stderr)
+
         dv.apply(parallel.tick)
         dv.execute('stats = parallel.stats')
         stats = dv.gather('stats')
 
-        for i, s in enumerate(stats):
-            printer.register(i, {
-                'summary': "%10.4g %10.4g\n" % (s['mean_fit'], s['mean_sccs'])
-            })
-
-        printer.tick()
+        print_tick(printer, stats)
 
 if __name__ == '__main__':
     main()

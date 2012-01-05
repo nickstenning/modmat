@@ -1,10 +1,10 @@
-from __future__ import division, absolute_import
+from __future__ import absolute_import, print_function
+
 
 import argparse
 import sys
 
-from modmat import ga
-from modmat import net
+from modmat import parallel
 from modmat.printer import Printer
 
 parser = argparse.ArgumentParser(description="Evolve randomly seeded matrices for stability")
@@ -18,24 +18,26 @@ parser.add_argument('-g', '--generations', metavar='ngens', type=int, default=20
 parser.add_argument('datadir',
                     help='output data directory')
 
-def main():
-    args = parser.parse_args()
-
-    pop, fit = ga.init(args.n, args.popsize)
-
-    printer = Printer(args.datadir, 1)
-
-    for _ in xrange(args.generations):
-        pop, fit = ga.tick(pop, fit)
-
-        mean_fit = sum(fit) / args.popsize
-        mean_sccs = sum(net.num_sccs_in_array(m) for m in pop) / args.popsize
-
-        printer.register(0, {
-            'summary': "%10.4g %10.4g\n" % (mean_fit, mean_sccs)
+def print_tick(printer, stats):
+    for i, s in enumerate(stats):
+        printer.register(i, {
+            'summary': "%10.4g %10.4g\n" % (s['mean_fit'], s['mean_sccs']),
+            'sccs_hist': ("%5d " * len(s['sccs_hist']) + "\n") % tuple(s['sccs_hist'])
         })
 
-        printer.tick()
+    printer.tick()
+
+def main():
+    args = parser.parse_args()
+    printer = Printer(args.datadir)
+
+    parallel.init(1, args.n, args.popsize)
+
+    for _ in xrange(args.generations):
+        print("Generation %d" % i, file=sys.stderr)
+
+        parallel.tick()
+        print_tick(printer, parallel.stats)
 
 
 if __name__ == '__main__':
