@@ -16,33 +16,28 @@ ctypedef np.double_t DTYPE_t
 
 ENTRY_DENSITY = 0.1
 
-INIT_SIZE = 1.0
-MUTATION_SIZE = INIT_SIZE / 10
-
 class InvalidCrossoverError(Exception):
     pass
 
-def init(n, popsize, zero_diag=False):
-    population = [_random_matrix(n, zero_diag=zero_diag) for _ in xrange(popsize)]
+def init(n, popsize):
+    population = [_random_matrix(n) for _ in xrange(popsize)]
     return population, _evaluate_fitnesses(population)
 
-def tick(population, fitnesses, zero_diag=False, mutation=False):
+def tick(population, fitnesses):
     new_population = []
     for _ in xrange(len(population) // 2):
-        new_population.extend(_get_children(population, fitnesses,
-                                            zero_diag=zero_diag, mutation=mutation))
-
+        new_population.extend(_get_children(population, fitnesses))
     new_population = new_population[:len(population)]
     return new_population, _evaluate_fitnesses(new_population)
 
-def _random_matrix(n, zero_diag=False):
+def _random_matrix(n):
     ary = np.zeros((n, n))
 
     for i in xrange(n):
         for j in xrange(n):
-            if not zero_diag or i != j:
-                if np.random.rand() < ENTRY_DENSITY:
-                    ary[i, j] = np.random.uniform(-INIT_SIZE, INIT_SIZE)
+            # if i != j:
+            if np.random.rand() < ENTRY_DENSITY:
+                ary[i, j] = np.random.uniform(-1, 1)
 
     return ary
 
@@ -125,28 +120,10 @@ def _matrix_crossover(ma, mb):
 
     return copya, copyb
 
-# Modifies matrix in-place
-def _matrix_mutate(m, zero_diag=False):
-    n = m.shape[0]
-
-    for i in xrange(n):
-        for j in xrange(n):
-            if not zero_diag or i != j:
-                if np.random.rand() < 1 / (10 * n * n):
-                    m[i, j] += np.random.uniform(-MUTATION_SIZE, MUTATION_SIZE)
-
-def _get_children(population, fitnesses, zero_diag=False, mutation=False):
+def _get_children(population, fitnesses):
     a = _roulette_select(population, fitnesses)
     b = _roulette_select(population, fitnesses)
 
-    ap, bp = _matrix_crossover(a, b)
-
-    if mutation:
-        _matrix_mutate(ap, zero_diag=zero_diag)
-        _matrix_mutate(bp, zero_diag=zero_diag)
-
-    return ap, bp
-
-
+    return _matrix_crossover(a, b)
 
 

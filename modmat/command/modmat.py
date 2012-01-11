@@ -18,10 +18,6 @@ parser.add_argument('-p', '--popsize', metavar='popsize', type=int, default=1000
                     help='size of population')
 parser.add_argument('-g', '--generations', metavar='ngens', type=int, default=2000,
                     help='number of generations to run for')
-parser.add_argument('-z', '--zero-diag', action='store_true', default=False,
-                    help='enforce zeros on diagonal')
-parser.add_argument('-m', '--mutation', action='store_true', default=False,
-                    help='use mutation')
 parser.add_argument('datadir',
                     help='output data directory')
 
@@ -52,7 +48,7 @@ def main():
     args = parser.parse_args()
     printer = Printer(args.datadir)
 
-    parallel.init(1, args.n, args.popsize, zero_diag=args.zero_diag)
+    parallel.init(1, args.n, args.popsize)
 
     save_populations(parallel.populations, os.path.join(args.datadir, 'arrays_initial.npz'))
 
@@ -61,10 +57,9 @@ def main():
 
         print_nets = True if i == args.generations - 1 else False
 
-        parallel.tick(mutation=args.mutation,
-                      zero_diag=args.zero_diag,
-                      print_nets=print_nets)
+        print(print_nets)
 
+        parallel.tick(print_nets)
         print_tick(printer, parallel.stats)
 
     save_populations(parallel.populations, os.path.join(args.datadir, 'arrays_final.npz'))
