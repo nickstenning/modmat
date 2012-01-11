@@ -3,6 +3,7 @@ from __future__ import absolute_import, print_function
 
 import argparse
 import os
+import json
 import sys
 
 import numpy as np
@@ -18,6 +19,8 @@ parser.add_argument('-p', '--popsize', metavar='popsize', type=int, default=1000
                     help='size of population')
 parser.add_argument('-g', '--generations', metavar='ngens', type=int, default=2000,
                     help='number of generations to run for')
+parser.add_argument('-k', '--knockout', action='store_true', default=False,
+                    help='use knockout fitness rather than default eigvals fitness')
 parser.add_argument('datadir',
                     help='output data directory')
 
@@ -44,11 +47,21 @@ def save_populations(populations, filename):
 
     np.savez(filename, **all_arrays)
 
+def save_args(args):
+    fname = os.path.join(args.datadir, 'args.json')
+
+    with open(fname, 'w') as fp:
+        json.dump(vars(args), fp, indent=2)
+
 def main():
     args = parser.parse_args()
+    fitness = 'knockout' if args.knockout else 'eigvals'
+
     printer = Printer(args.datadir)
 
-    parallel.init(1, args.n, args.popsize)
+    save_args(args)
+
+    parallel.init(1, args.n, args.popsize, fitness=fitness)
 
     save_populations(parallel.populations, os.path.join(args.datadir, 'arrays_initial.npz'))
 
@@ -57,9 +70,8 @@ def main():
 
         print_nets = True if i == args.generations - 1 else False
 
-        print(print_nets)
-
-        parallel.tick(print_nets)
+        parallel.tick(print_nets=print_nets,
+                      fitness=fitness)
         print_tick(printer, parallel.stats)
 
     save_populations(parallel.populations, os.path.join(args.datadir, 'arrays_final.npz'))

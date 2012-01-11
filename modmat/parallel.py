@@ -14,7 +14,7 @@ populations = None
 fitnesses = None
 stats = None
 
-def init(npops, n, popsize):
+def init(npops, n, popsize, fitness='eigvals'):
     global _npops, _n, _popsize
     global populations, fitnesses, stats
 
@@ -26,15 +26,15 @@ def init(npops, n, popsize):
     stats = [None] * _npops
 
     for i in xrange(_npops):
-        pop, fit = ga.init(_n, _popsize)
+        pop, fit = ga.init(_n, _popsize, fitness=fitness)
         populations.append(pop)
         fitnesses.append(fit)
 
-def tick(print_nets=False):
+def tick(print_nets=False, fitness='eigvals'):
     global stats, populations, fitnesses
 
     for i in xrange(_npops):
-        populations[i], fitnesses[i] = ga.tick(populations[i], fitnesses[i])
+        populations[i], fitnesses[i] = ga.tick(populations[i], fitnesses[i], fitness=fitness)
 
         sccs = [net.sccs_in_array(m) for m in populations[i]]
         sccs_flat = [x for s in sccs for x in s] # sccs across population

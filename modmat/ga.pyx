@@ -19,16 +19,17 @@ ENTRY_DENSITY = 0.1
 class InvalidCrossoverError(Exception):
     pass
 
-def init(n, popsize):
+def init(n, popsize, fitness='eigvals'):
     population = [_random_matrix(n) for _ in xrange(popsize)]
-    return population, _evaluate_fitnesses(population)
+    return population, _evaluate_fitnesses(population, fitness)
 
-def tick(population, fitnesses):
+def tick(population, fitnesses, fitness='eigvals'):
     new_population = []
     for _ in xrange(len(population) // 2):
         new_population.extend(_get_children(population, fitnesses))
     new_population = new_population[:len(population)]
-    return new_population, _evaluate_fitnesses(new_population)
+
+    return new_population, _evaluate_fitnesses(new_population, fitness)
 
 def _random_matrix(n):
     ary = np.zeros((n, n))
@@ -44,7 +45,7 @@ def _random_matrix(n):
 _coerce_complex = np.vectorize(np.complex)
 
 @cython.cdivision(True)
-def _prop_negative_eigvals(np.ndarray[DTYPE_t, ndim=2] mat):
+def _eigvals_fitness(np.ndarray[DTYPE_t, ndim=2] mat):
     cdef np.ndarray[np.complex_t, ndim=1] eigvals = _coerce_complex(np.linalg.eigvals(mat))
     cdef int n_eigvals = eigvals.shape[0]
     cdef double count = 0.0
@@ -83,9 +84,13 @@ def _knockout_fitness(np.ndarray[DTYPE_t, ndim=2] mat):
 
     return 1 / (1.0 + distance)
 
-def _evaluate_fitnesses(population):
-    # return [_prop_negative_eigvals(mat) for mat in population]
-    return [_knockout_fitness(mat) for mat in population]
+def _evaluate_fitnesses(population, fitness='eigvals'):
+    if fitness == 'knockout':
+        fitness_func = _knockout_fitness
+    else:
+        fitness_func = _eigvals_fitness
+
+    return [fitness_func(mat) for mat in population]
 
 def _roulette_select(population, fitnesses):
     tot = sum(fitnesses)
