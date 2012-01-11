@@ -5,6 +5,10 @@ import numpy as np
 cimport cython
 cimport numpy as np
 
+cdef extern from "math.h":
+    double sqrt(double x)
+    double pow(double base, double exp)
+
 __all__ = ['init', 'tick']
 
 DTYPE = np.double
@@ -56,8 +60,37 @@ def _prop_negative_eigvals(np.ndarray[DTYPE_t, ndim=2] mat):
 
     return count / (1.0 * n_eigvals)
 
+@cython.cdivision(True)
+def _knockout_fitness(np.ndarray[DTYPE_t, ndim=2] mat):
+    cdef np.ndarray[np.complex_t, ndim=1] eigvals = _coerce_complex(np.linalg.eigvals(mat))
+    cdef int n_eigvals = eigvals.shape[0]
+
+    # Knock out a random edge
+    edges = zip(*mat.nonzero())
+    edge = edges[np.random.randint(len(edges))]
+
+    cdef np.ndarray[DTYPE_t, ndim=2] mat_new = mat.copy()
+    mat_new[edge] = 0.0
+
+    # Compute new e-values
+    cdef np.ndarray[np.complex_t, ndim=1] eigvals_new = _coerce_complex(np.linalg.eigvals(mat_new))
+
+    cdef double distance = 0.0
+    cdef double rdelta
+    cdef double idelta
+
+    for i in xrange(n_eigvals):
+        rdelta = eigvals[i].real - eigvals_new[i].real
+        idelta = eigvals[i].imag - eigvals_new[i].imag
+        distance += sqrt(rdelta * rdelta + idelta * idelta)
+
+    distance = pow(distance, 1/(1.0 * n_eigvals))
+
+    return 1 / (1.0 + distance)
+
 def _evaluate_fitnesses(population):
-    return [_prop_negative_eigvals(mat) for mat in population]
+    # return [_prop_negative_eigvals(mat) for mat in population]
+    return [_knockout_fitness(mat) for mat in population]
 
 def _roulette_select(population, fitnesses):
     tot = sum(fitnesses)
