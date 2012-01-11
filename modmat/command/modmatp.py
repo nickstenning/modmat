@@ -33,14 +33,20 @@ def main():
         npops[i] += 1
 
     for i in xrange(nc):
-        rc[i].apply(parallel.init, npops[i], args.n, args.popsize)
+        rc[i].apply(parallel.init,
+                    npops[i], args.n, args.popsize,
+                    zero_diag=args.zero_diag)
 
     for i in xrange(args.generations):
         print("Generation %d" % i, file=sys.stderr)
 
         print_nets = True if i == args.generations - 1 else False
 
-        dv.apply(parallel.tick, print_nets)
+        dv.apply(parallel.tick,
+                 mutation=args.mutation,
+                 zero_diag=args.zero_diag,
+                 print_nets=print_nets)
+
         dv.execute('stats = parallel.stats')
         stats = dv.gather('stats')
 
