@@ -38,7 +38,9 @@ def main():
     for i in xrange(args.generations):
         print("Generation %d" % i, file=sys.stderr)
 
-        dv.apply(parallel.tick)
+        print_nets = True if i == args.generations - 1 else False
+
+        dv.apply(parallel.tick, print_nets)
         dv.execute('stats = parallel.stats')
         stats = dv.gather('stats')
 

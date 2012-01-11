@@ -1,5 +1,7 @@
 from __future__ import division
 
+import numpy as np
+
 from modmat import ga
 from modmat import net
 from modmat import util
@@ -28,7 +30,7 @@ def init(npops, n, popsize):
         populations.append(pop)
         fitnesses.append(fit)
 
-def tick():
+def tick(print_nets=False):
     global stats, populations, fitnesses
 
     for i in xrange(_npops):
@@ -44,3 +46,8 @@ def tick():
             'mean_sccs': sum([len(s) for s in sccs]) / _popsize,
             'sccs_hist': sccs_hist
         }
+
+        if print_nets:
+            rand_net = populations[i][np.random.randint(_popsize)]
+            stats[i]['net'] = net.array_to_dot(rand_net)
+

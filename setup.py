@@ -10,7 +10,8 @@ setup(
     include_dirs = [np.get_include()],
 
     install_requires = [
-        'networkx==1.6'
+        'networkx==1.6',
+        'pygraphviz==1.1'
     ],
 
     entry_points = {

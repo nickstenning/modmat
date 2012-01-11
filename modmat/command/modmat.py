@@ -20,10 +20,15 @@ parser.add_argument('datadir',
 
 def print_tick(printer, stats):
     for i, s in enumerate(stats):
-        printer.register(i, {
+        to_print = {
             'summary': "%10.4g %10.4g\n" % (s['mean_fit'], s['mean_sccs']),
             'sccs_hist': ("%5d " * len(s['sccs_hist']) + "\n") % tuple(s['sccs_hist'])
-        })
+        }
+
+        if 'net' in s:
+            to_print['net'] = s['net']
+
+        printer.register(i, to_print)
 
     printer.tick()
 
@@ -33,10 +38,14 @@ def main():
 
     parallel.init(1, args.n, args.popsize)
 
-    for _ in xrange(args.generations):
+    for i in xrange(args.generations):
         print("Generation %d" % i, file=sys.stderr)
 
-        parallel.tick()
+        print_nets = True if i == args.generations - 1 else False
+
+        print(print_nets)
+
+        parallel.tick(print_nets)
         print_tick(printer, parallel.stats)
 
 
