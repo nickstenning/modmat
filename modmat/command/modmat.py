@@ -2,7 +2,10 @@ from __future__ import absolute_import, print_function
 
 
 import argparse
+import os
 import sys
+
+import numpy as np
 
 from modmat import parallel
 from modmat.printer import Printer
@@ -36,11 +39,22 @@ def print_tick(printer, stats):
 
     printer.tick()
 
+def save_populations(populations, filename):
+    all_arrays = {}
+
+    for i, p in enumerate(populations):
+        for j, a in enumerate(p):
+            all_arrays['pop%d_arr%d' % (i, j)] = a
+
+    np.savez(filename, **all_arrays)
+
 def main():
     args = parser.parse_args()
     printer = Printer(args.datadir)
 
     parallel.init(1, args.n, args.popsize, zero_diag=args.zero_diag)
+
+    save_populations(parallel.populations, os.path.join(args.datadir, 'arrays_initial.npz'))
 
     for i in xrange(args.generations):
         print("Generation %d" % i, file=sys.stderr)
@@ -52,6 +66,9 @@ def main():
                       print_nets=print_nets)
 
         print_tick(printer, parallel.stats)
+
+    save_populations(parallel.populations, os.path.join(args.datadir, 'arrays_final.npz'))
+
 
 
 if __name__ == '__main__':

@@ -1,11 +1,12 @@
 from __future__ import absolute_import, division, print_function
 
+import os
 import sys
 from IPython.parallel import Client
 
 from modmat import parallel
 from modmat.printer import Printer
-from modmat.command.modmat import parser, print_tick
+from modmat.command.modmat import parser, print_tick, save_populations
 
 parser.add_argument('-i', '--iprofile',
                     help='IPython parallel profile to use', default='default')
@@ -37,6 +38,12 @@ def main():
                     npops[i], args.n, args.popsize,
                     zero_diag=args.zero_diag)
 
+
+    dv.execute('pops = parallel.populations')
+    pops = dv.gather('pops')
+    save_populations(pops, os.path.join(args.datadir, 'arrays_initial.npz'))
+    dv.execute('del pops')
+
     for i in xrange(args.generations):
         print("Generation %d" % i, file=sys.stderr)
 
@@ -51,6 +58,11 @@ def main():
         stats = dv.gather('stats')
 
         print_tick(printer, stats)
+
+    dv.execute('pops = parallel.populations')
+    pops = dv.gather('pops')
+    save_populations(pops, os.path.join(args.datadir, 'arrays_final.npz'))
+    dv.execute('del pops')
 
 if __name__ == '__main__':
     main()
