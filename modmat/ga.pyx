@@ -111,17 +111,18 @@ def _matrix_crossover(ma, mb):
     if ma.shape[0] != mb.shape[1]:
         raise InvalidCrossoverError("Can't crossover non-square matrices!")
 
-    corner_1, corner_2 = np.random.randint(ma.shape[0] + 1, size=(2, 2))
+    n = ma.shape[0]
 
-    for i in xrange(2):
-        if corner_1[i] > corner_2[i]:
-            corner_1[i], corner_2[i] = corner_2[i], corner_1[i]
+    corner = np.random.randint(n + 1, size=2)
+    szx, szy = np.random.randint(1, n + 1, size=2)
 
     copya = ma.copy()
     copyb = mb.copy()
 
-    copya[corner_1[0]:corner_2[0],corner_1[1]:corner_2[1]] = mb[corner_1[0]:corner_2[0],corner_1[1]:corner_2[1]]
-    copyb[corner_1[0]:corner_2[0],corner_1[1]:corner_2[1]] = ma[corner_1[0]:corner_2[0],corner_1[1]:corner_2[1]]
+    for i in xrange(szx):
+        for j in xrange(szy):
+            copya[(corner[0] + i) % n, (corner[1] + j) % n] = mb[(corner[0] + i) % n, (corner[1] + j) % n]
+            copyb[(corner[0] + i) % n, (corner[1] + j) % n] = ma[(corner[0] + i) % n, (corner[1] + j) % n]
 
     return copya, copyb
 
