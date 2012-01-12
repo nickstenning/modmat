@@ -41,9 +41,12 @@ def tick(print_nets=False, fitness='eigvals'):
         sccs_hist = util.histogram(sccs_flat)
         sccs_hist = util.truncate_or_pad(sccs_hist, _n + 1, 0)[1:]
 
+        hamm = util.mean_hamming(populations[i])
+
         stats[i] = {
             'mean_fit': sum(fitnesses[i]) / _popsize,
             'mean_sccs': sum([len(s) for s in sccs]) / _popsize,
+            'mean_hamm': hamm,
             'sccs_hist': sccs_hist
         }
 

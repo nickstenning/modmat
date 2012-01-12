@@ -27,8 +27,8 @@ parser.add_argument('datadir',
 def print_tick(printer, stats):
     for i, s in enumerate(stats):
         to_print = {
-            'summary': "%10.4g %10.4g\n" % (s['mean_fit'], s['mean_sccs']),
-            'sccs_hist': ("%5d " * len(s['sccs_hist']) + "\n") % tuple(s['sccs_hist'])
+            'summary': "%10.4g %10.4g %10.4g\n" % (s['mean_fit'], s['mean_hamm'], s['mean_sccs']),
+            'sccs_hist': ("%5d " * len(s['sccs_hist']) + "\n") % tuple(s['sccs_hist']),
         }
 
         if 'net' in s:
