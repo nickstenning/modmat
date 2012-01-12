@@ -113,7 +113,7 @@ def _matrix_crossover(ma, mb):
 
     n = ma.shape[0]
 
-    corner = np.random.randint(n + 1, size=2)
+    corner = np.random.randint(n, size=2)
     szx, szy = np.random.randint(1, n + 1, size=2)
 
     copya = ma.copy()
