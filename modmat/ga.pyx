@@ -36,9 +36,8 @@ def _random_matrix(n):
 
     for i in xrange(n):
         for j in xrange(n):
-            if i != j:
-                if np.random.rand() < ENTRY_DENSITY:
-                    ary[i, j] = np.random.uniform(-1, 1)
+            if np.random.rand() < ENTRY_DENSITY:
+                ary[i, j] = np.random.uniform(-1, 1)
 
     return ary
 
