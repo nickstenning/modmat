@@ -77,9 +77,9 @@ def _knockout_fitness(np.ndarray[DTYPE_t, ndim=2] mat):
     for i in xrange(n_eigvals):
         rdelta = eigvals[i].real - eigvals_new[i].real
         idelta = eigvals[i].imag - eigvals_new[i].imag
-        distance += sqrt(rdelta * rdelta + idelta * idelta)
+        distance += rdelta * rdelta + idelta * idelta
 
-    distance = pow(distance, 1/(1.0 * n_eigvals))
+    distance = sqrt(distance)
 
     return 1 / (1.0 + distance)
 
