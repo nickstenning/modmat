@@ -14,17 +14,17 @@ pos = np.zeros((N, N))
 for k, arr in fp.iteritems():
     for i in xrange(N):
         for j in xrange(N):
-            if arr[i, j] != 0:
-                neg[i, j] += 1
-
-            # if arr[i, j] > 0:
-            #     pos[i, j] += 1
-            # elif arr[i, j] < 0:
+            # if arr[i, j] != 0:
             #     neg[i, j] += 1
+
+            if arr[i, j] > 0:
+                pos[i, j] += 1
+            elif arr[i, j] < 0:
+                neg[i, j] += 1
 
 matplotlib.rcParams.update({'font.size': 18})
 
-neg /= 8000.0
+neg /= 32000.0
 
 plt.imshow(neg, interpolation='nearest')
 # plt.imshow(pos, interpolation='nearest')

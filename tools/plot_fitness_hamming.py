@@ -51,7 +51,7 @@ def main():
     plot_set(hamming, 'r', ploton=ax2)
 
     ax1.set_xlabel('generation')
-    ax1.set_xlim(0, 600)
+    # ax1.set_xlim(0, 600)
 
     ax1.set_ylabel('fitness')
     ax2.set_ylabel('mean hamming distance')

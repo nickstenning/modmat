@@ -47,9 +47,8 @@ def main():
     data = np.array(data)
 
     plot_generation(data, 0,    'b-')
-    plot_generation(data, 80,  'g--')
-    # plot_generation(data, 399,  'g--')
-    # plot_generation(data, 1999, 'r:')
+    plot_generation(data, 399,  'g--')
+    plot_generation(data, 1999, 'r:')
 
     plt.legend()
     plt.axes().set_xlim(0, len(data[0][...,0]))
